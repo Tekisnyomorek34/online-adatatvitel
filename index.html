@@ -33,12 +33,12 @@
     <!-- FŐ PANEL (REJTVE A BELÉPÉSIG) -->
     <div id="main-screen" class="box hidden">
         <h2>Adatkapcsolat Aktív</h2>
-        <p>A Te egyedi azonosítód (küldd el a társadnak): <br><b id="my-id" style="color: #00ffcc;">Betöltés...</b></p>
+        <p>A Te egyedi azonosítód (küldd el másik eszközre): <br><b id="my-id" style="color: #00ffcc;">Betöltés...</b></p>
         
         <hr style="border-color: #333;">
         
-        <p>Csatlakozás a társhoz:</p>
-        <input type="text" id="peer-id-input" placeholder="Társad azonosítója...">
+        <p>Csatlakozás másik eszközhöz:</p>
+        <input type="text" id="peer-id-input" placeholder="Más eszköz azonosítója...">
         <button onclick="csatlakozasAStarsig()">Kapcsolódás</button>
         
         <p>Státusz: <span id="status" style="color: yellow;">Várakozás kapcsolatra...</span></p>
@@ -60,7 +60,7 @@
     </div>
 
     <script>
-        const HELYES_JELSZO = "ezegyoldal123";
+        const HELYES_JELSZO = "192837465";
         let peer;
         let conn;
         let ideiglenesAdat = null;
