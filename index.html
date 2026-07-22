@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P2P Adatátvitel</title>
-    <!-- Ingyenes hálózati összekötő könyvtár -->
     <script src="https://unpkg.com"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #121212; color: #e0e0e0; text-align: center; padding: 20px; }
@@ -21,7 +20,6 @@
 </head>
 <body>
 
-    <!-- BELÉPŐ PANEL -->
     <div id="login-screen" class="box">
         <h2>Zárt Adatátviteli Csatorna</h2>
         <p>Kérlek, add meg a belépési jelszót:</p>
@@ -30,20 +28,16 @@
         <p id="login-error" style="color: red;"></p>
     </div>
 
-    <!-- FŐ PANEL (REJTVE A BELÉPÉSIG) -->
     <div id="main-screen" class="box hidden">
         <h2>Adatkapcsolat Aktív</h2>
-        <p>A Te egyedi azonosítód (küldd el másik eszközre): <br><b id="my-id" style="color: #00ffcc;">Betöltés...</b></p>
+        <p>A Te egyedi azonosítód:<br><b id="my-id" style="color: #00ffcc;">Készítés...</b></p>
         
         <hr style="border-color: #333;">
-        
-        <p>Csatlakozás másik eszközhöz:</p>
+        <p>Csatlakozás a társhoz:</p>
         <input type="text" id="peer-id-input" placeholder="Más eszköz azonosítója...">
         <button onclick="csatlakozasAStarsig()">Kapcsolódás</button>
-        
         <p>Státusz: <span id="status" style="color: yellow;">Várakozás kapcsolatra...</span></p>
 
-        <!-- BEJÖVŐ ADAT JÓVÁHAGYÁSA -->
         <div id="incoming-alert" class="alert-box hidden">
             <p id="alert-text">Új adatcsomag érkezett!</p>
             <button class="btn-yes" onclick="adatElfogadasa()">Elfogadás</button>
@@ -51,19 +45,14 @@
         </div>
 
         <hr style="border-color: #333;">
-
-        <!-- ADATKÜLDÉS -->
         <input type="text" id="message-input" placeholder="Küldendő adat/üzenet..." disabled>
         <button id="send-btn" onclick="adatKuldese()" disabled>Adatcsomag Küldése</button>
-
         <div id="chat"></div>
     </div>
 
     <script>
-        const HELYES_JELSZO = "192837465";
-        let peer;
-        let conn;
-        let ideiglenesAdat = null;
+        const HELYES_JELSZO = "ezegyoldal123";
+        let peer; let conn; let ideiglenesAdat = null;
 
         function ellenorizJelszo() {
             const beirt = document.getElementById("password-input").value;
@@ -76,14 +65,11 @@
             }
         }
 
-        // Itt van a javított hálózati kapcsolat!
         function rendszerInditasa() {
-            peer = new Peer({
-                host: '://peerjs.com',
-                port: 443,
-                path: '/',
-                secure: true
-            });
+            // Generálunk egy véletlenszerű 5 számjegyű egyedi szobakódot, így nem kell a felhőre várni!
+            const randomId = "szoba-" + Math.floor(10000 + Math.random() * 90000);
+            
+            peer = new Peer(randomId);
 
             peer.on('open', (id) => {
                 document.getElementById("my-id").innerText = id;
@@ -93,14 +79,16 @@
                 conn = connection;
                 kapcsolatBeallitasa();
             });
+
+            peer.on('error', (err) => {
+                console.log(err);
+                document.getElementById("my-id").innerText = "Hiba, próbáld újra frissítéssel!";
+            });
         }
 
         function csatlakozasAStarsig() {
             const tarsId = document.getElementById("peer-id-input").value;
-            if (tarsId) {
-                conn = peer.connect(tarsId);
-                kapcsolatBeallitasa();
-            }
+            if (tarsId) { conn = peer.connect(tarsId); kapcsolatBeallitasa(); }
         }
 
         function kapcsolatBeallitasa() {
@@ -110,13 +98,11 @@
                 document.getElementById("message-input").disabled = false;
                 document.getElementById("send-btn").disabled = false;
             });
-
             conn.on('data', (data) => {
                 ideiglenesAdat = data;
                 document.getElementById("alert-text").innerText = "Érkező adatcsomag! Elfogadod?";
                 document.getElementById("incoming-alert").classList.remove("hidden");
             });
-
             conn.on('close', () => {
                 document.getElementById("status").innerText = "A kapcsolat megszakadt.";
                 document.getElementById("status").style.color = "red";
@@ -126,14 +112,11 @@
         function adatElutasitasa() {
             ideiglenesAdat = null;
             document.getElementById("incoming-alert").classList.add("hidden");
-            kiirKonzolra("Rendszer", "Bejövő adatcsomag elutasítva és megsemmisítve.", "red");
+            kiirKonzolra("Rendszer", "Bejövő adatcsomag elutasítva.", "red");
         }
 
         function adatElfogadasa() {
-            if (ideiglenesAdat) {
-                kiirKonzolra("Társad", ideiglenesAdat, "#00ffcc");
-                ideiglenesAdat = null;
-            }
+            if (ideiglenesAdat) { kiirKonzolra("Társad", ideiglenesAdat, "#00ffcc"); ideiglenesAdat = null; }
             document.getElementById("incoming-alert").classList.add("hidden");
         }
 
